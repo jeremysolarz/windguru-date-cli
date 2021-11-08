@@ -1,13 +1,25 @@
 #!/bin/bash
 
+## please set spots & spot_ids here manually
+## e.g.: 
+# spots=("El_Gouna")
+# spot_ids=(25164)
+spots=("DK_Kloster")
+spot_ids=(500768)
+
+idu_from_arg=${1:-1505322}
+
+month_day_from="05-01"
+month_day_to="05-30"
+
 function weather() {
   idu=$1
   spot=$2
   spot_id=$3
   year=$4
 
-  date_from="$year-05-30"
-  date_to="$year-06-09"
+  date_from="$year-$month_day_from"
+  date_to="$year-$month_day_to"
 
   data="date_from=$date_from&date_to=$date_to&id_spot=$spot_id&step=3&pwindspd=1&psmer=1&ptmp=1&id_model=3&id_stats_type=1"
   mkdir -p $spot
@@ -23,18 +35,11 @@ function weather() {
   convert ${spot}/${spot}_${year}.jpg -gravity East -chop 250x0 ${spot}/${spot}_${year}.jpg
 }
 
-
-idu_from_arg=$1
-
 if [[ -z "$idu_from_arg" ]] ; then
   echo "Please provide an idu token!"
   exit 1
 fi
 
-## please set spots & spot_ids here manually
-## e.g.: 
-# spots=("El_Gouna" "Soma_Bay" "Hamata")
-# spot_ids=(25164 153754 172696)
 
 if [[ -z "$spots" || -z "$spot_ids" ]] ; then
   echo "Please set both spots & spot_ids in the file manually!"
@@ -47,7 +52,7 @@ do
   rm -rf $spot
 done
 
-for year in 2019 2018 2017 2016 2015 2014
+for year in 2020 2019 2018 2017 2016 2015 2014
 # for year in 2019
 do
     echo "Creating for year: $year"
