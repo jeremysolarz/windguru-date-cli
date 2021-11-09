@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "==2.26.0"
+ptvsd = "==4.3.2"
+Flask = "==2.0.2"
+click = "8.0.3"
+imgkit = "1.2.2"
+wand = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
