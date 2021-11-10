@@ -1,12 +1,18 @@
 # windguru-date-cli
-A tiny bash script to scrape the windguru date UI for your user (via cookie-id)
+A tiny Pyhton script to scrape the windguru date UI for your user (via cookie-id)
 
 ## How to use this script
+You can call the command with different parameters.
 
-1. Open https://windguru.cz
-2. Login via Google SSO
-3. Open Developer Tools
-4. Go to "Network" tab
-5. Get *idu* value of Cookie
+Use: pyhton app.py --help for a complete description.
 
-Use idu value e.g. 1505322 as value for cli
+As an example see:
+python app.py --idu 1505322 \
+    --spots "Essaouira" \
+    --month-from 11 \
+    --day-from 28 \
+    --month-to 12 \
+    --day-to 5 \
+    --years 2018 \
+    --years 2019 \
+    --years 2020
