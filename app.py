@@ -7,91 +7,197 @@ import os
 import traceback
 import shutil
 import imgkit
+import enquiries
+import json
+import re
 from wand.image import Image
-from wand.display import display
+from cv2 import cv2
 
-## please set spots & spot_ids here manually
-## e.g.:
+# later used to replace multiple underscores
+rx = re.compile(r'_{2,}')
 
-month_day_from="05-01"
-month_day_to="05-30"
+def get_options(query):
+
+    print(query)
+    headers = {'Referer': 'https://www.windguru.cz/'}
+
+    params = {
+        "q":"autocomplete_ss",
+        "type_info":"true",
+        "all":"0",
+        "latlon":"1",
+        "country":"1",
+        "favourite":"1",
+        "custom":"1",
+        "stations":"1",
+        "geonames":"40",
+        "spots":"1",
+        "priority_sort":"1",
+        "query": query,
+        "_mha":"58184b7b"
+    }
+
+    r = requests.get('https://www.windguru.cz/int/iapi.php', headers=headers, params=params)
+
+    options = json.loads(r.text)
+
+    return [(save_filename(suggestion["value"]), suggestion["data"]) for suggestion in options["suggestions"][:5]]
+
+def save_filename(filename):
+    filename = "".join([c if c.isalpha() or c.isdigit() else '_' if c ==' ' else '' for c in filename]).rstrip()
+    return rx.sub('_', filename)
 
 
-def weather(idu, spot_name, spot_id, year):
-    date_from="{year}-{month_day_from}".format(year=year, month_day_from=month_day_from)
-    date_to="{year}-{month_day_to}".format(year=year, month_day_to=month_day_to)
+def get_folder_name(spot):
+    return "generated/{spot}/".format(spot=spot)
 
-    print(idu, spot_name, spot_id, date_from, date_to)
+
+def weather(
+        idu, spot_name, spot_id,
+        month_from,
+        day_from,
+        month_to,
+        day_to,
+        year
+):
+    date_from = "{year}-{month_from}-{day_from}".format(
+        year=year,
+        month_from=month_from,
+        day_from=day_from
+    )
+    date_to = "{year}-{month_to}-{day_to}".format(
+        year=year,
+        month_to=month_to,
+        day_to=day_to
+    )
 
     cookies = {"idu": str(idu)}
-    params={
+    params = {
         "date_from": date_from,
         "date_to": date_to,
         "id_spot": spot_id,
         "step": 3,
-        "pwindspd":1,
+        "pwindspd": 1,
         "psmer": 1,
         "ptmp": 1,
         "id_model": 3,
-        "id_stats_type":1
+        "id_stats_type": 1
     }
 
     r = requests.get('https://www.windguru.cz/ajax/ajax_archive.php', cookies=cookies, params=params)
 
-    file_name = "{spot}/{spot}_{year}".format(spot=spot_name, year=year)
+    file_name = "{folder}/{spot}_{year}".format(folder=get_folder_name(spot_name), spot=spot_name, year=year)
     with open(f"{file_name}.html", 'w') as f:
         f.write('<b>{year}</b><br\>'.format(year=year))
         f.write(r.text)
-    imgkit.from_file(f"{file_name}.html", f"{file_name}.jpg")
+    imgkit.from_file(f"{file_name}.html", f"{file_name}_original.jpg")
 
-    with Image(filename=f"{file_name}.jpg") as img:
+    with Image(filename=f"{file_name}_original.jpg") as img:
+        img.crop(width=img.width - 250, height=img.height, gravity='west')
+        img.save(filename=f"{file_name}_resized.jpg")
+
     # convert ${spot}/${spot}_${year}.jpg -gravity East -chop 250x0 ${spot}/${spot}_${year}.jpg
 
+
 def recreate_directory(spot_name):
-    if os.path.exists(spot_name):
+    folder_name = get_folder_name(spot_name)
+    if os.path.exists(folder_name):
         # removing the file using the os.remove() method
         try:
-            shutil.rmtree(spot_name)
+            shutil.rmtree(folder_name)
         except OSError as e:
-            print("Cloud not delete dirctory %s" % spot_name)
+            print("Cloud not delete directory %s" % folder_name)
             traceback.print_exc()
 
     try:
-        os.makedirs(spot_name)
+        os.makedirs(folder_name)
     except OSError:
-        print ("Creation of the directory %s failed" % spot_name)
+        print("Creation of the directory %s failed" % folder_name)
         traceback.print_exc()
     else:
-        print ("Successfully created the directory %s" % spot_name)
+        print("Successfully created the directory %s" % folder_name)
 
-def delete_htmls(spot_name):
-    files = os.listdir(spot_name)
+
+def delete_files(spot_name, suffixes):
+    folder_name = get_folder_name(spot_name)
+    files = os.listdir(folder_name)
 
     for file in files:
-        if file.endswith(".html"):
-            os.remove(os.path.join(spot_name, file))
+        for suffix in suffixes:
+            if file.endswith(suffix):
+                os.remove(os.path.join(folder_name, file))
+
 
 def create_overview(spot_name):
-    delete_htmls(spot_name)
-    # convert -append El_Gouna/*.jpg El_Gouna/El_Gouna_overview.jpg
+    folder_name = get_folder_name(spot_name)
+    files = sorted(os.listdir(folder_name))
+
+    images = []
+
+    for file in files:
+        if file.endswith("_resized.jpg"):
+            # for a vertical stacking it is simple: use vstack
+            images.append(cv2.imread(f"{folder_name}/{file}"))
+            # convert -append El_Gouna/*.jpg El_Gouna/El_Gouna_overview.jpg
+    im_v = cv2.vconcat(images)
+
+    # show the output image
+    cv2.imwrite(f"{folder_name}/{spot_name}_overview.jpg", im_v)
+
 
 @click.command()
-@click.option('--idu', default=1505322, required=True,
+@click.option('--idu', required=True,
               help='idu from Cookie of windguru.cz')
-@click.option('--spots', type=(str, int), default=[("DK_Kloster", 500768)], required=True, multiple=True,
+@click.option('--spots', required=True, multiple=True,
               help='Spotname and id from windguru.cz')
-@click.option('--years', default=[2020, 2019, 2018, 2017, 2016, 2015, 2014], required=True, multiple=True,
+@click.option('--month_from', '-mf', required=True,
+              help='Month from')
+@click.option('--day_from', '-df', required=True,
+              help='Day from')
+@click.option('--month_to', '-mt', required=True,
+              help='Month to')
+@click.option('--day_to', '-dt', required=True,
+              help='Day to')
+@click.option('--years', '-y', default=[2020], required=True, multiple=True,
               help='Years to generate report(s) for')
-def main(idu, spots, years):
-    for spot in spots:
-        spot_name, spot_id = spot
+def main(
+    idu,
+    spots,
+    month_from,
+    day_from,
+    month_to,
+    day_to,
+    years
+):
+
+    for spot_name in spots:
+        options = get_options(spot_name)
+
+        if not options:
+            print("Spot could not be found")
+            return
+
+        option_list = [key for key, value in options]
+
+        spot_name = enquiries.choose('Choose one of these options: ', option_list)
+        spot_id = dict(options)[spot_name]
+
         recreate_directory(spot_name)
 
         for year in years:
             print("Creating for year: {year}".format(year=year))
-            weather(idu, spot_name, spot_id, year)
-
+            weather(
+                idu,
+                spot_name,
+                spot_id,
+                month_from,
+                day_from,
+                month_to,
+                day_to,
+                year
+            )
         create_overview(spot_name)
+        delete_files(spot_name, [".html", "_resized.jpg", "_original.jpg"])
 
 if __name__ == '__main__':
     main()
