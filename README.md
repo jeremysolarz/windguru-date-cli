@@ -8,7 +8,7 @@ Use: pyhton app.py --help for a complete description.
 
 As an example see:
 ```
-python app.py --idu 1505322 \
+python app.py --idu <your-idu> \
     --spots "Essaouira" \
     --month-from 11 \
     --day-from 28 \
