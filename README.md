@@ -7,6 +7,7 @@ You can call the command with different parameters.
 Use: pyhton app.py --help for a complete description.
 
 As an example see:
+```
 python app.py --idu 1505322 \
     --spots "Essaouira" \
     --month-from 11 \
@@ -16,3 +17,4 @@ python app.py --idu 1505322 \
     --years 2018 \
     --years 2019 \
     --years 2020
+```
