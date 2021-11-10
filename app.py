@@ -150,13 +150,13 @@ def create_overview(spot_name):
               help='idu from Cookie of windguru.cz')
 @click.option('--spots', required=True, multiple=True,
               help='Spotname and id from windguru.cz')
-@click.option('--month_from', '-mf', required=True,
+@click.option('--month-from', '-mf', required=True,
               help='Month from')
-@click.option('--day_from', '-df', required=True,
+@click.option('--day-from', '-df', required=True,
               help='Day from')
-@click.option('--month_to', '-mt', required=True,
+@click.option('--month-to', '-mt', required=True,
               help='Month to')
-@click.option('--day_to', '-dt', required=True,
+@click.option('--day-to', '-dt', required=True,
               help='Day to')
 @click.option('--years', '-y', default=[2020], required=True, multiple=True,
               help='Years to generate report(s) for')
