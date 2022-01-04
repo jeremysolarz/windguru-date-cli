@@ -41,7 +41,7 @@ def get_options(query):
 
     options = json.loads(r.text)
 
-    return [(save_filename(suggestion["value"]), suggestion["data"]) for suggestion in options["suggestions"][:5]]
+    return [(save_filename(suggestion["value"]), suggestion["data"]) for suggestion in options["suggestions"][:10]]
 
 def save_filename(filename):
     filename = "".join([c if c.isalpha() or c.isdigit() else '_' if c ==' ' else '' for c in filename]).rstrip()
@@ -179,25 +179,27 @@ def main(
 
         option_list = [key for key, value in options]
 
-        spot_name = enquiries.choose('Choose one of these options: ', option_list)
-        spot_id = dict(options)[spot_name]
+        spot_names = enquiries.choose('Choose one of these options: ', option_list, multi=True)
 
-        recreate_directory(spot_name)
+        for spot_name in spot_names:
+            spot_id = dict(options)[spot_name]
 
-        for year in years:
-            print("Creating for year: {year}".format(year=year))
-            weather(
-                idu,
-                spot_name,
-                spot_id,
-                month_from,
-                day_from,
-                month_to,
-                day_to,
-                year
-            )
-        create_overview(spot_name)
-        delete_files(spot_name, [".html", "_resized.jpg", "_original.jpg"])
+            recreate_directory(spot_name)
+
+            for year in years:
+                print("Creating for year: {year}".format(year=year))
+                weather(
+                    idu,
+                    spot_name,
+                    spot_id,
+                    month_from,
+                    day_from,
+                    month_to,
+                    day_to,
+                    year
+                )
+            create_overview(spot_name)
+            delete_files(spot_name, [".html", "_resized.jpg", "_original.jpg"])
 
 if __name__ == '__main__':
     main()
