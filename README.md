@@ -47,7 +47,7 @@ You need to share a folder to generate the images.
 
 You can call the command with different parameters.
 
-Use: pyhton app.py --help for a complete description.
+Use: `python app.py --help` for a complete description.
 
 As an example see:
 ```
