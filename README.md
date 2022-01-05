@@ -65,4 +65,5 @@ python app.py --idu <your-idu> \
 ```
 
 As a visual example:
+
 ![Tool run-through as gif](assets/example.gif "Tool run-through as gif")
