@@ -5,9 +5,9 @@ A tiny Pyhton script to scrape the windguru date UI for your user (via cookie-id
 
 1. Open your browser and navigate to [https://www.windguru.cz/](https://www.windguru.cz/)
 2. Login to Windguru.cz via the bottom right login button e.g. via Google Single-Sign-On
-3. Open one of the forecast pages in your browser e.g. [https://www.windguru.cz/43](https://www.windguru.cz/43)
+3. Open one of the forecast pages for a spot in your browser e.g. [https://www.windguru.cz/43](https://www.windguru.cz/43)
 4. Open your Developer Console to extract the `idu` from the cookie e.g. for Chrome in Mac ⌥ + ⌘ + J (see example image
-   below for another spot)
+   below for another spot with number 559365)
    1. Go to the Network tab
    2. Reload the page
    3. Select the second entry in the list called like the number of your spot e.g. 43
