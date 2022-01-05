@@ -11,6 +11,7 @@ click = "8.0.3"
 imgkit = "1.2.2"
 wand = "0.6.7"
 enquiries = "~=0.1.0"
+opencv-python-headless  = "4.5.5.62"
 
 [dev-packages]
 

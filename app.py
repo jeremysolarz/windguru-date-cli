@@ -90,7 +90,8 @@ def weather(
     with open(f"{file_name}.html", 'w') as f:
         f.write('<b>{year}</b><br\>'.format(year=year))
         f.write(r.text)
-    imgkit.from_file(f"{file_name}.html", f"{file_name}_original.jpg")
+    options = {"xvfb": ""}
+    imgkit.from_file(f"{file_name}.html", f"{file_name}_original.jpg", options=options)
 
     with Image(filename=f"{file_name}_original.jpg") as img:
         img.crop(width=img.width - 250, height=img.height, gravity='west')
