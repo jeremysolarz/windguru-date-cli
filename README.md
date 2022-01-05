@@ -32,13 +32,15 @@ You need to share a folder to generate the images.
 ```bash
   docker run -it -v $(pwd)/generated:/app/generated windguru-date-cli --idu <your-idu> \
     --spots "Tarifa" \
+    --spots "El Gouna" \
     --month-from 11 \
     --day-from 28 \
     --month-to 12 \
     --day-to 5 \
     --years 2018 \
     --years 2019 \
-    --years 2020
+    --years 2020 \
+    --years 2021
 ```
 
 ## Options of this script
@@ -50,6 +52,7 @@ Use: pyhton app.py --help for a complete description.
 As an example see:
 ```
 python app.py --idu <your-idu> \
+    --spots "Tarifa" \
     --spots "Essaouira" \
     --month-from 11 \
     --day-from 28 \
@@ -57,7 +60,8 @@ python app.py --idu <your-idu> \
     --day-to 5 \
     --years 2018 \
     --years 2019 \
-    --years 2020
+    --years 2020 \
+    --years 2021
 ```
 
 As a visual example:
