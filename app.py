@@ -72,7 +72,10 @@ def weather(
         day_to=day_to
     )
 
-    cookies = {"idu": str(idu), "login_md5": str(login_md5)}
+    cookies = {
+        "idu": str(idu),
+        "login_md5": str(login_md5)
+    }
     params = {
         "date_from": date_from,
         "date_to": date_to,
