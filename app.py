@@ -53,7 +53,8 @@ def get_folder_name(spot):
 
 
 def weather(
-        idu, spot_name, spot_id,
+        idu, login_md5,
+        spot_name, spot_id,
         month_from,
         day_from,
         month_to,
@@ -73,7 +74,7 @@ def weather(
 
     cookies = {
         "idu": str(idu),
-        "login_md5": str("22a676b6a7747cb611f9331535b95983")
+        "login_md5": str(login_md5)
     }
     params = {
         "date_from": date_from,
@@ -152,6 +153,8 @@ def create_overview(spot_name):
 @click.command()
 @click.option('--idu', required=True,
               help='idu from Cookie of windguru.cz')
+@click.option('--login_md5', required=True,
+              help= 'login_md5 from Cookie of windguru.cz')
 @click.option('--spots', required=True, multiple=True,
               help='Spotname and id from windguru.cz')
 @click.option('--month-from', '-mf', required=True,
@@ -166,6 +169,7 @@ def create_overview(spot_name):
               help='Years to generate report(s) for')
 def main(
     idu,
+    login_md5,
     spots,
     month_from,
     day_from,
@@ -194,6 +198,7 @@ def main(
                 print("Creating for year: {year}".format(year=year))
                 weather(
                     idu,
+                    login_md5,
                     spot_name,
                     spot_id,
                     month_from,
